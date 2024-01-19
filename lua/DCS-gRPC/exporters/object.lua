@@ -21,6 +21,10 @@ GRPC.exporters.unit = function(unit)
   if locgroup then
     locgroup = GRPC.exporters.group(locgroup)
   end
+  local pos = unit:getPoint()
+  local alt = pos.y
+  local land = land.getHeight({x = pos.x, y = pos.z}) or 0
+  alt = alt - land
   return {
     id = tonumber(unit:getID()),
     name = unit:getName(),
@@ -31,6 +35,7 @@ GRPC.exporters.unit = function(unit)
     group = locgroup,
     numberInGroup = unit:getNumber(),
     rawTransform = GRPC.exporters.rawTransform(unit),
+    agl = alt,
   }
 end
 
