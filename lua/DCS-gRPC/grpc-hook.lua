@@ -53,8 +53,14 @@ function handler.onPlayerTrySendChat(playerID, msg, all)
   local toAll = true
   if coalition ~= nil then coalition = coalition + 1 end
   if all == -2 then toAll = false end
+  local modelTime
+  if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+    modelTime = DCS.getModelTime()
+  else
+    modelTime = Sim.getModelTime()
+  end
   grpc.event({
-    time = DCS.getModelTime(),
+    time = modelTime,
     event = {
       type = "playerSendChat",
       playerId = playerID,
@@ -67,8 +73,14 @@ function handler.onPlayerTrySendChat(playerID, msg, all)
 end
 
 function handler.onPlayerTryConnect(addr, name, ucid, id)
+  local modelTime
+  if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+    modelTime = DCS.getModelTime()
+  else
+    modelTime = Sim.getModelTime()
+  end
   grpc.event({
-    time = DCS.getModelTime(),
+    time = modelTime,
     event = {
       type = "connect",
       addr = addr,
@@ -80,8 +92,14 @@ function handler.onPlayerTryConnect(addr, name, ucid, id)
 end
 
 function handler.onPlayerDisconnect(id, reason)
+  local modelTime
+  if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+    modelTime = DCS.getModelTime()
+  else
+    modelTime = Sim.getModelTime()
+  end
   grpc.event({
-    time = DCS.getModelTime(),
+    time = modelTime,
     event = {
       type = "disconnect",
       id = id,
@@ -93,14 +111,20 @@ end
 function handler.onPlayerChangeSlot(playerId)
   local playerInfo = net.get_player_info(playerId)
   local coalition, slot
+  local modelTime
 
   if playerInfo ~= nil then
     coalition = playerInfo.side + 1 -- offsetting for grpc COALITION enum
     slot = playerInfo.slot
   end
 
+  if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+    modelTime = DCS.getModelTime()
+  else
+    modelTime = Sim.getModelTime()
+  end
   grpc.event({
-    time = DCS.getModelTime(),
+    time = modelTime,
     event = {
       type = "playerChangeSlot",
       playerId = playerId,
@@ -110,4 +134,8 @@ function handler.onPlayerChangeSlot(playerId)
   })
 end
 
-DCS.setUserCallbacks(handler)
+if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+  DCS.setUserCallbacks(handler)
+else
+  Sim.setUserCallbacks(handler)
+end

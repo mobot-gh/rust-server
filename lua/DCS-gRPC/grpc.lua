@@ -265,7 +265,11 @@ else -- hook env
   local skipFrames = math.ceil(interval / 0.016) -- 0.016 = 16ms = 1 frame at 60fps
   local frame = 0
   function GRPC.onSimulationFrame()
-    grpc.simulationFrame(DCS.getModelTime())
+    if DCS then --Backwards compatibility with DCS versions <= 2.9.17.12034
+      grpc.simulationFrame(DCS.getModelTime())
+    else
+      grpc.simulationFrame(Sim.getModelTime())
+    end
 
     frame = frame + 1
     if frame >= skipFrames then
